@@ -101,7 +101,7 @@ class restful_api(object):
         return cls
 
 
-def create_resource_handler(Model, method=None, id_key='uid'):
+def create_resource_handler(Model, method=None):
     custom_serializers = getattr(Model, 'SERIALIZERS', None)
     serializer_func = partial(serialize_json, serializers=custom_serializers)
 
@@ -139,8 +139,8 @@ def create_resource_handler(Model, method=None, id_key='uid'):
             results, next_cursor, has_more = query.fetch_page(limit, start_cursor=cursor)
             if has_more:
                 meta.update({ 'cursor': next_cursor.urlsafe() })
-        items = (entity.to_dict(include=visible_fields) for entity in results)
-        return (meta, {item[id_key]: item for item in items})
+        items = { entity.key.id(): entity.to_dict(include=visible_fields) for entity in results }
+        return (meta, items)
 
     def default_get(_, uid):
         item = Model.get_by_id(uid)
@@ -184,8 +184,8 @@ def create_resource_handler(Model, method=None, id_key='uid'):
             result = getattr(Model, method)(*args, **kwargs)
             visible_fields = getattr(Model, 'VISIBLE_FIELDS', None)
             if hasattr(result, '__iter__'):
-                items = (entity.to_dict(include=visible_fields) for entity in result)
-                return {item[id_key]: item for item in items}
+                items = {entity.key.id(): entity.to_dict(include=visible_fields) for entity in result }
+                return items
             else:
                 return result.to_dict(include=visible_fields)
 

@@ -14,8 +14,8 @@ Just copy-paste the .py file into your lib/ folder.
 from rest_up import ResourceRoutes
 from models.user import User
 ROUTES = [
-    ResourceRoutes('/users', User, id_key='user_id')
-    ResourceRoutes('/city/<city_name:[^/]+>/users', User, method='by_city', id_key='user_id')
+    ResourceRoutes('/users', User)
+    ResourceRoutes('/city/<city_name:[^/]+>/users', User, method='by_city')
 ]
 ```
 
